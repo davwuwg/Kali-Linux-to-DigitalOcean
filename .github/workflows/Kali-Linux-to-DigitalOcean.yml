@@ -11,20 +11,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Fetch Latest Kali Linux Version
-        id: fetch_version
+      - name: Set Download URL
+        id: set_download_url
         run: |
-          URL=$(curl -s https://kali.download/cloud-images/current/ | grep -oE 'kali-linux-[0-9]+\.[0-9]+-cloud-genericcloud-amd64.tar.xz' | head -n 1)
-          FULL_URL="https://kali.download/cloud-images/current/$URL"
-          KALI_VERSION=$(echo $URL | grep -oE '[0-9]+\.[0-9]+')
-          echo "KALI_VERSION=$KALI_VERSION" >> $GITHUB_ENV
-          echo "IMAGE_URL=$FULL_URL" >> $GITHUB_ENV
+          IMAGE_URL="https://kali.download/cloud-images/current/kali-linux-2025.1a-cloud-genericcloud-amd64.tar.xz"
+          echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_ENV
 
       - name: Download Kali Linux Image
         run: wget ${{ env.IMAGE_URL }}
 
       - name: Extract Image
-        run: tar -xvf kali-linux-${{ env.KALI_VERSION }}-cloud-genericcloud-amd64.tar.xz
+        run: tar -xvf kali-linux-2025.1a-cloud-genericcloud-amd64.tar.xz
 
       - name: Compress Image to gzip
         run: gzip -c disk.raw > disk.raw.gz
@@ -49,7 +46,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add version.txt
-          git commit -m "Update version to ${{ env.NEW_VERSION }} - Kali Linux ${{ env.KALI_VERSION }}"
+          git commit -m "Update version to ${{ env.NEW_VERSION }} - Kali Linux 2025.1a"
           git push
 
       - name: Create Release
@@ -72,7 +69,7 @@ jobs:
           -H "Authorization: Bearer $DIGITALOCEAN_ACCESS_TOKEN" \
           -H "Content-Type: application/json" \
           -d "{
-                \"name\": \"Kali Linux ${{ env.KALI_VERSION }} from GitHub Actions\",
+                \"name\": \"Kali Linux 2025.1a from GitHub Actions\",
                 \"url\": \"https://github.com/${{ github.repository }}/releases/download/${{ env.NEW_VERSION }}/disk.raw.gz\",
                 \"distribution\": \"Debian\",
                 \"region\": \"${{ env.REGION }}\",
